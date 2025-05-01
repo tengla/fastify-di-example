@@ -13,7 +13,11 @@ tasks:
   migrate:
     desc: Run migrations
     cmds:
-      - atlas schema apply --url "{{.dbfile}}" --to "{{.schema}}"
+      - atlas schema apply
+        --auto-approve
+        --var dialect=sqlite
+        --url "{{.dbfile}}"
+        --to "{{.schema}}"
     silent: true
   codegen:
     desc: Generate types
@@ -24,6 +28,10 @@ tasks:
         --out-file ./src/generated/db.d.ts
     silent: true
   default:
+    desc: Run all tasks
+    deps:
+      - migrate
+      - codegen
     cmds:
-      - echo "hola potato"
+      - echo "hola potato, migrated and generated"
     silent: true

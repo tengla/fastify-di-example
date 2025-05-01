@@ -1,21 +1,22 @@
 import { db } from "@/packages/database";
-import { type Practitioners } from "@/generated/db.d";
+import { type Patients } from "@/generated/db.d";
 import { type CRUDRepository } from "./icrud";
 import { DeleteResult, type Insertable, type Updateable } from "kysely";
 import { injectable } from "tsyringe";
 
 @injectable()
-export class PractitionersRepository implements CRUDRepository<Practitioners> {
-  async create(item: Insertable<Practitioners>) {
+export class PatientsRepository implements CRUDRepository<Patients> {
+  tableName: "patients" = "patients";
+  async create(item: Insertable<Patients>) {
     return db
-      .insertInto("practitioners")
+      .insertInto(this.tableName)
       .values(item)
       .returningAll()
       .executeTakeFirstOrThrow();
   }
   async read(id: number) {
     const result = await db
-      .selectFrom("practitioners")
+      .selectFrom(this.tableName)
       .selectAll()
       .where("id", "=", id)
       .executeTakeFirst();
@@ -25,9 +26,9 @@ export class PractitionersRepository implements CRUDRepository<Practitioners> {
     }
     return result;
   }
-  async update(id: number, item: Updateable<Practitioners>) {
+  async update(id: number, item: Updateable<Patients>) {
     const updated = await db
-      .updateTable("practitioners")
+      .updateTable(this.tableName)
       .set(item)
       .where("id", "=", id)
       .returningAll()
@@ -37,20 +38,20 @@ export class PractitionersRepository implements CRUDRepository<Practitioners> {
     }
     return updated;
   }
-  async list()  {
+  async list() {
     return Promise.resolve([]);
   }
   delete(id: number): Promise<DeleteResult[]> {
-    return db.deleteFrom("practitioners").where("id", "=", id).execute();
+    return db.deleteFrom(this.tableName).where("id", "=", id).execute();
   }
   async deleteAll(): Promise<boolean> {
-    await db.deleteFrom("practitioners").execute();
+    await db.deleteFrom("patients").execute();
     return true;
   }
-  findBy(field: keyof Practitioners, value: any): Promise<Practitioners | null> {
+  findBy(field: keyof Patients, value: any): Promise<Patients | null> {
     throw new Error("Method not implemented.");
   }
-  findAllBy(field: keyof Practitioners, value: any): Promise<Practitioners[]> {
+  findAllBy(field: keyof Patients, value: any): Promise<Patients[]> {
     throw new Error("Method not implemented.");
   }
   count(): Promise<number> {

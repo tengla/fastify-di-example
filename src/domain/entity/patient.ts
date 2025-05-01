@@ -1,1 +1,4 @@
-class Patient {}
+import { injectable } from "tsyringe";
+
+@injectable()
+export class PatientEntity {}

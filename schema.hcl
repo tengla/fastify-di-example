@@ -141,6 +141,10 @@ table "audits" {
     type           = integer
     auto_increment = true
   }
+  column "user_id" {
+    null = true
+    type = integer
+  }
   column "action" {
     null = false
     type = text

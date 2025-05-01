@@ -31,7 +31,9 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "rootDir": ".",
-    "outDir": "./dist"
-  }
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "."
+  },
+  "exclude": ["./vitest.config.ts", "./node_modules", "./dist"],
 }

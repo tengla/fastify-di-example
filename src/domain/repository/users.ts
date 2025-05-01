@@ -1,8 +1,10 @@
 import { db } from "@/packages/database";
-import { type Users } from "@/generated/db";
+import { type Users } from "@/generated/db.d";
 import { type CRUDRepository } from "./icrud";
-import { type Insertable, type Updateable } from "kysely";
+import { DeleteResult, type Insertable, type Updateable } from "kysely";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class UsersRepository implements CRUDRepository<Users> {
   async create(item: Insertable<Users>) {
     return db
@@ -38,8 +40,12 @@ export class UsersRepository implements CRUDRepository<Users> {
   async list()  {
     return Promise.resolve([]);
   }
-  delete(id: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  delete(id: number): Promise<DeleteResult[]> {
+    return db.deleteFrom("users").where("id", "=", id).execute();
+  }
+  async deleteAll(): Promise<boolean> {
+    await db.deleteFrom("users").execute();
+    return true;
   }
   findBy(field: keyof Users, value: any): Promise<Users | null> {
     throw new Error("Method not implemented.");

@@ -10,12 +10,21 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 
 export interface Appointments {
-  created_at: Generated<string | null>;
+  created_at: Generated<string>;
   end_time: string;
   id: Generated<number | null>;
   patient_id: number;
   practitioner_id: number;
   start_time: string;
+}
+
+export interface Audits {
+  action: string;
+  id: Generated<number | null>;
+  record_id: number;
+  table_name: string;
+  timestamp: Generated<string>;
+  user_id: number | null;
 }
 
 export interface Patients {
@@ -44,6 +53,7 @@ export interface Users {
 
 export interface DB {
   appointments: Appointments;
+  audits: Audits;
   patients: Patients;
   practitioners: Practitioners;
   users: Users;

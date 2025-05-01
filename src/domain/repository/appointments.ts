@@ -1,7 +1,7 @@
 import { db } from "@/packages/database";
 import { type Appointments } from "@/generated/db";
 import { type CRUDRepository } from "./icrud";
-import { type Insertable, type Updateable } from "kysely";
+import { DeleteResult, type Insertable, type Updateable } from "kysely";
 
 export class AppointmentsRepository implements CRUDRepository<Appointments> {
   async create(item: Insertable<Appointments>) {
@@ -35,22 +35,45 @@ export class AppointmentsRepository implements CRUDRepository<Appointments> {
     }
     return updated;
   }
-  async list()  {
-    return Promise.resolve([]);
+  list() {
+    return db
+      .selectFrom("appointments")
+      .selectAll()
+      .orderBy("created_at", "desc")
+      .execute();
   }
-  delete(id: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  delete(id: number): Promise<DeleteResult[]> {
+    return db.deleteFrom("appointments").where("id", "=", id).execute();
   }
-  findBy(field: keyof Appointments, value: any): Promise<Appointments | null> {
-    throw new Error("Method not implemented.");
+  findBy(field: keyof Appointments, value: any) {
+    return db.selectFrom("appointments")
+      .selectAll()
+      .where(field, "=", value)
+      .executeTakeFirstOrThrow();
   }
-  findAllBy(field: keyof Appointments, value: any): Promise<Appointments[]> {
-    throw new Error("Method not implemented.");
+  findAllBy(field: keyof Appointments, value: any) {
+    return db
+      .selectFrom("appointments")
+      .selectAll()
+      .where(field, "=", value)
+      .execute();
   }
-  count(): Promise<number> {
-    throw new Error("Method not implemented.");
+  count() {
+    return db
+      .selectFrom("appointments")
+      .select(db.fn.count("id").as("count"))
+      .executeTakeFirstOrThrow()
   }
-  exists(id: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async exists(id: number): Promise<boolean> {
+    const result = await db
+      .selectFrom("appointments")
+      .select(db.fn.count("id").as("count"))
+      .where("id", "=", id)
+      .executeTakeFirst();
+    if (!result) {
+      return false;
+    }
+    const count = result.count as number;
+    return count > 0;
   }
 }
