@@ -1,0 +1,29 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  dbfile: sqlite://store.db
+  schema: file://schema.hcl
+
+env:
+  DATABASE_URL: ./store.db
+
+tasks:
+  migrate:
+    desc: Run migrations
+    cmds:
+      - atlas schema apply --url "{{.dbfile}}" --to "{{.schema}}"
+    silent: true
+  codegen:
+    desc: Generate types
+    cmds:
+      - export DATABASE_URL=$(echo {{.dbfile}} | cut -d/ -f3)
+      - ./node_modules/.bin/kysely-codegen 
+        --dialect sqlite3 
+        --out-file ./src/generated/db.d.ts
+    silent: true
+  default:
+    cmds:
+      - echo "hola potato"
+    silent: true
