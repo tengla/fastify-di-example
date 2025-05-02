@@ -1,15 +1,13 @@
-# sir-make-alot
+# Fastify DI example (Dependency Injection via tsyringe)
 
 To install dependencies:
 
 ```bash
-bun install
+npm install
 ```
 
 To run:
 
 ```bash
-bun run src/index.ts
+npx tsx src/examples/jwt-auth-example.ts
 ```
-
-This project was created using `bun init` in bun v1.2.10. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
