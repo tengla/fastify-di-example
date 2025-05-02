@@ -1,10 +1,13 @@
 import "reflect-metadata";
 import Fastify from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import { scoped, Lifecycle } from "tsyringe";
 import { registerDependencies, requestScopePlugin, authUserPlugin } from "../packages/di";
 import { AuthService } from "../domain/services/auth.service";
+import { DashboardService } from "../domain/services/dashboard.service";
 import fp from "fastify-plugin";
+import { CreatePractitionerUseCase } from "@/domain/use-cases/employees/create-practitioner";
+import { GetPractitionersUseCase } from "@/domain/use-cases/employees/get-practitioners";
+import type { UseCaseError } from "@/domain/use-cases/use-case";
 
 // Register global dependencies
 registerDependencies();
@@ -64,10 +67,18 @@ fastify.register(jwtAuthPlugin);
 fastify.register(authUserPlugin);
 
 // Login route - generates a token
-fastify.post('/api/login', async (request, reply) => {
-  const { email, password } = request.body as any;
+fastify.post<{
+  Body: {
+    email: string;
+    password: string;
+  };
+  Reply: {
+    token?: string;
+    error?: string;
+  };
+}>('/api/login', async (request, reply) => {
+  const { email, password } = request.body;
   
-  // In real app, verify credentials against database
   if (email === 'admin@example.com' && password === 'password') {
     // Generate token with user data
     const token = fastify.jwt.sign({
@@ -117,67 +128,48 @@ fastify.get('/api/profile', async (request, reply) => {
   };
 });
 
-// Role-based route (admin only)
-fastify.get('/api/admin/users', async (request, reply) => {
+fastify.post<{
+  Body: {
+    name: string;
+    email: string;
+  };
+  Reply: {
+    practitioner?: any;
+    error?: string;
+  };
+}>('/api/practitioners', async (request, reply) => {
   const authService = request.container.resolve(AuthService);
-  
-  if (!authService.hasRole('admin')) {
+  if (!authService.isAuthenticated()) {
+    return reply.code(401).send({ error: 'Authentication required' });
+  }
+  const user = authService.user;
+  if (user.role !== 'admin') {
     return reply.code(403).send({ error: 'Admin access required' });
   }
-  
-  // Mock user list (would come from database in real app)
-  return {
-    users: [
-      { id: 1, email: 'admin@example.com', role: 'admin' },
-      { id: 2, email: 'user@example.com', role: 'user' },
-      { id: 3, email: 'user2@example.com', role: 'user' }
-    ]
-  };
+  const { name, email } = request.body;
+  const useCase = request.container.resolve(CreatePractitionerUseCase);
+  const practitioner = await useCase.execute({
+    name, 
+    email
+  });
+  return { practitioner };
+});
+
+fastify.get('/api/practitioners', async (request, reply) => {
+  const useCase = request.container.resolve(GetPractitionersUseCase);
+  try {
+    const practitioners = await useCase.execute();
+    return { practitioners };
+  } catch (err: unknown) {
+    const error = err as UseCaseError;
+    return reply.code(error.httpCode).send({
+      error: error.message
+    });
+  }
 });
 
 // Custom use case that needs the authenticated user
 fastify.get('/api/dashboard', async (request, reply) => {
-  // Create a dashboard service that uses the AuthService
-  @scoped(Lifecycle.ContainerScoped)
-  class DashboardService {
-    constructor(private authService: AuthService) {}
-    
-    async getDashboardData() {
-      if (!this.authService.isAuthenticated()) {
-        throw new Error('Authentication required');
-      }
-      
-      const user = this.authService.user;
-      
-      // Different dashboard data based on user role
-      if (this.authService.hasRole('admin')) {
-        return {
-          metrics: {
-            totalUsers: 45,
-            activeUsers: 32,
-            revenue: '$12,450'
-          },
-          recentActivities: [
-            { type: 'user_signup', user: 'john@example.com', time: '2h ago' },
-            { type: 'payment_received', amount: '$199', time: '3h ago' }
-          ]
-        };
-      } else {
-        return {
-          metrics: {
-            tasks: 12,
-            completed: 8,
-            pending: 4
-          },
-          recentActivities: [
-            { type: 'task_completed', task: 'Upload documents', time: '2h ago' },
-            { type: 'comment_added', comment: 'Great job!', time: '3h ago' }
-          ]
-        };
-      }
-    }
-  }
-  
   try {
     // Register and resolve the dashboard service
     request.container.register(DashboardService, DashboardService);

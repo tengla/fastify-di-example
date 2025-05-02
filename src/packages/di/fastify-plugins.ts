@@ -52,6 +52,5 @@ export const authUserPlugin = fp(async (fastify: FastifyInstance) => {
 declare module 'fastify' {
   interface FastifyRequest {
     container: import("tsyringe").DependencyContainer;
-    user?: { id: number; email: string; role?: string };
   }
 }

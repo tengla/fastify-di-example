@@ -1,10 +1,12 @@
 import "reflect-metadata";
 import { container } from "tsyringe";
+import { CreatePractitionerUseCase } from "@/domain/use-cases/employees/create-practitioner";
+import { GetPractitionersUseCase } from "@/domain/use-cases/employees/get-practitioners";
 
 // Register any global dependencies here
 export function registerDependencies() {
-  // Example for global dependencies:
-  // container.register(Logger, { useClass: ConsoleLogger });
+  container.register(CreatePractitionerUseCase, CreatePractitionerUseCase);
+  container.register(GetPractitionersUseCase, GetPractitionersUseCase);
 }
 
 // Export container utilities

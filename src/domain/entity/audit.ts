@@ -8,7 +8,7 @@ export class AuditEntity {
   constructor(
     @inject(AuditsRepository) private auditsRepository: AuditsRepository
   ) {}
-  async logAuditEntry(
+  async log(
     action: Action,
     table_name: string,
     record_id: number,

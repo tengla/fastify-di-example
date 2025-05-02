@@ -37,8 +37,11 @@ export class PractitionersRepository implements CRUDRepository<Practitioners> {
     }
     return updated;
   }
-  async list()  {
-    return Promise.resolve([]);
+  list() {
+    return db
+      .selectFrom("practitioners")
+      .selectAll()
+      .execute()
   }
   delete(id: number): Promise<DeleteResult[]> {
     return db.deleteFrom("practitioners").where("id", "=", id).execute();
@@ -47,14 +50,28 @@ export class PractitionersRepository implements CRUDRepository<Practitioners> {
     await db.deleteFrom("practitioners").execute();
     return true;
   }
-  findBy(field: keyof Practitioners, value: any): Promise<Practitioners | null> {
-    throw new Error("Method not implemented.");
+  findBy(field: keyof Practitioners, value: any) {
+    return db.selectFrom("practitioners")
+      .selectAll()
+      .where(field, "=", value)
+      .executeTakeFirstOrThrow();
   }
-  findAllBy(field: keyof Practitioners, value: any): Promise<Practitioners[]> {
-    throw new Error("Method not implemented.");
+  findAllBy(field: keyof Practitioners, value: any) {
+    return db
+      .selectFrom("practitioners")
+      .selectAll()
+      .where(field, "=", value)
+      .execute();
   }
-  count(): Promise<number> {
-    throw new Error("Method not implemented.");
+  async count(): Promise<{ count: string | number | bigint }> {
+    const result = await db
+      .selectFrom("practitioners")
+      .select(db.fn.count("id").as("count"))
+      .executeTakeFirst();
+    if (!result) {
+      throw new Error("No result found");
+    }
+    return result;
   }
   exists(id: number): Promise<boolean> {
     throw new Error("Method not implemented.");

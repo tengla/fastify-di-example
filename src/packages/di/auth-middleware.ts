@@ -46,11 +46,3 @@ export const authUserPlugin = fp(async (fastify) => {
     }
   });
 });
-
-// Extend Fastify Request interface to include our custom properties
-declare module 'fastify' {
-  interface FastifyRequest {
-    container: import("tsyringe").DependencyContainer;
-    user?: { id: number; email: string; role?: string };
-  }
-}
