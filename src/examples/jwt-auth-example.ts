@@ -1,13 +1,14 @@
-import "reflect-metadata";
+import "reflect-metadata/lite";
 import Fastify from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import { registerDependencies, requestScopePlugin, authUserPlugin } from "../packages/di";
+import { registerDependencies, containerPlugin, authUserPlugin } from "../packages/di";
 import { AuthService } from "../domain/services/auth.service";
 import { DashboardService } from "../domain/services/dashboard.service";
 import fp from "fastify-plugin";
 import { CreatePractitionerUseCase } from "@/domain/use-cases/employees/create-practitioner";
 import { GetPractitionersUseCase } from "@/domain/use-cases/employees/get-practitioners";
 import type { UseCaseError } from "@/domain/use-cases/use-case";
+import { WelcomeUseCase } from "@/domain/use-cases/welcome/welcome";
 
 // Register global dependencies
 registerDependencies();
@@ -23,7 +24,7 @@ fastify.register(fastifyJwt, {
 });
 
 // Register our DI container plugins
-fastify.register(requestScopePlugin);
+fastify.register(containerPlugin);
 
 /**
  * JWT auth plugin that verifies the token and extracts user data
@@ -187,6 +188,20 @@ fastify.get('/api/dashboard', async (request, reply) => {
       error: error.message
     });
   }
+});
+
+fastify.get<{
+  Params: {
+    name: string;
+  };
+  Reply: {
+    message: string;
+  };
+}>('/api/welcome/:name', async (request) => {
+  const usecase = request.container.resolve(WelcomeUseCase);
+  const { name } = request.params;
+  const message = await usecase.execute(name);
+  return { message };
 });
 
 // Start the server

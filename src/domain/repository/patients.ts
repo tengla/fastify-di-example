@@ -48,14 +48,28 @@ export class PatientsRepository implements CRUDRepository<Patients> {
     await db.deleteFrom("patients").execute();
     return true;
   }
-  findBy(field: keyof Patients, value: any): Promise<Patients | null> {
-    throw new Error("Method not implemented.");
+  findBy(field: keyof Patients, value: any) {
+    return db.selectFrom("patients")
+      .selectAll()
+      .where(field, "=", value)
+      .executeTakeFirstOrThrow();
   }
-  findAllBy(field: keyof Patients, value: any): Promise<Patients[]> {
-    throw new Error("Method not implemented.");
+  findAllBy(field: keyof Patients, value: any) {
+    return db
+      .selectFrom("practitioners")
+      .selectAll()
+      .where(field, "=", value)
+      .execute();
   }
-  count(): Promise<number> {
-    throw new Error("Method not implemented.");
+  async count() {
+    const result = await db
+      .selectFrom("patients")
+      .select(db.fn.count("id").as("count"))
+      .executeTakeFirst();
+    if (!result) {
+      throw new Error("No result found");
+    }
+    return result;
   }
   exists(id: number): Promise<boolean> {
     throw new Error("Method not implemented.");

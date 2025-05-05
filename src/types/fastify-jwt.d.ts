@@ -9,5 +9,6 @@ declare module '@fastify/jwt' {
 declare module 'fastify' {
   interface FastifyRequest {
     user?: AuthUserProps;
+    container: import("tsyringe").DependencyContainer;
   }
 }

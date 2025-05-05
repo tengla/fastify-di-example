@@ -47,10 +47,3 @@ export const authUserPlugin = fp(async (fastify: FastifyInstance) => {
     }
   });
 });
-
-// Extend Fastify types to include our custom properties
-declare module 'fastify' {
-  interface FastifyRequest {
-    container: import("tsyringe").DependencyContainer;
-  }
-}

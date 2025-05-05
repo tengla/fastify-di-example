@@ -5,14 +5,14 @@
   "scripts": {
     "test": "vitest src",
     "start": "bun run src/index.ts",
-    "example": "bun run src/examples/jwt-auth-example.ts"
+    "example": "bun run src/examples/jwt-auth-example.ts",
+    "build": "bun run src/index.ts"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
     "kysely-codegen": "^0.18.3",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
     "vitest": "^3.1.2"
   },
   "peerDependencies": {
@@ -25,6 +25,7 @@
     "fastify-plugin": "^4.5.1",
     "kysely": "^0.27.0",
     "reflect-metadata": "^0.2.2",
-    "tsyringe": "^4.10.0"
+    "tsyringe": "^4.10.0",
+    "tsx": "^4.19.4"
   }
 }

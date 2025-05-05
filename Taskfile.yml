@@ -33,5 +33,5 @@ tasks:
       - migrate
       - codegen
     cmds:
-      - echo "hola potato, migrated and generated"
+      - echo "Hola 🥔 - migrated db and generated types"
     silent: true

@@ -1,16 +1,19 @@
 {
+  
   "compilerOptions": {
     // Environment setup & latest features
-    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
+    "isolatedModules": true,
     "jsx": "react-jsx",
     "allowJs": true,
-
+    "lib": ["ESNext" ],
+    "types": ["node"],
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
@@ -31,9 +34,10 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "baseUrl": "."
+    "outDir": "dist",
+    "sourceMap": true,
+    "baseUrl": ".",
   },
-  "exclude": ["./vitest.config.ts", "./node_modules", "./dist"],
+  "include": ["./src/**/*"],
+  "exclude": ["vitest.config.ts"],
 }

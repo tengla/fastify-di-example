@@ -37,20 +37,34 @@ export class AuditsRepository implements CRUDRepository<Audits> {
     }
     return updated;
   }
-  async list()  {
+  async list() {
     return Promise.resolve([]);
   }
   delete(id: number): Promise<DeleteResult[]> {
     return db.deleteFrom("audits").where("id", "=", id).execute();
   }
-  findBy(field: keyof Audits, value: any): Promise<Audits | null> {
-    throw new Error("Method not implemented.");
+  findBy(field: keyof Audits, value: any) {
+    return db.selectFrom("audits")
+      .selectAll()
+      .where(field, "=", value)
+      .executeTakeFirstOrThrow();
   }
-  findAllBy(field: keyof Audits, value: any): Promise<Audits[]> {
-    throw new Error("Method not implemented.");
+  findAllBy(field: keyof Audits, value: any) {
+    return db
+      .selectFrom("audits")
+      .selectAll()
+      .where(field, "=", value)
+      .execute();
   }
-  count(): Promise<number> {
-    throw new Error("Method not implemented.");
+  async count() {
+    const result = await db
+      .selectFrom("audits")
+      .select(db.fn.count("id").as("count"))
+      .executeTakeFirst();
+    if (!result) {
+      throw new Error("No result found");
+    }
+    return result;
   }
   exists(id: number): Promise<boolean> {
     throw new Error("Method not implemented.");

@@ -47,14 +47,21 @@ export class UsersRepository implements CRUDRepository<Users> {
     await db.deleteFrom("users").execute();
     return true;
   }
-  findBy(field: keyof Users, value: any): Promise<Users | null> {
-    throw new Error("Method not implemented.");
+  findBy(field: keyof Users, value: any) {
+    return db.selectFrom("users")
+      .selectAll()
+      .where(field, "=", value)
+      .executeTakeFirstOrThrow();
   }
-  findAllBy(field: keyof Users, value: any): Promise<Users[]> {
-    throw new Error("Method not implemented.");
+  findAllBy(field: keyof Users, value: any) {
+    return db
+      .selectFrom("users")
+      .selectAll()
+      .where(field, "=", value)
+      .execute();
   }
-  count(): Promise<number> {
-    throw new Error("Method not implemented.");
+  count()  {
+    return Promise.resolve({ count: 0 });
   }
   exists(id: number): Promise<boolean> {
     throw new Error("Method not implemented.");

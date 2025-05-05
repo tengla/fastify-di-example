@@ -8,6 +8,6 @@ export interface CRUDRepository<T> {
   list(): Promise<Selectable<T>[]>;
   findBy(field: keyof T, value: any): Promise<Selectable<T> | null>;
   findAllBy(field: keyof T, value: any): Promise<Selectable<T>[]>;
-  count(): Promise<{count: string|number|bigint}>;
+  count(): Promise<{ count: string | number | bigint }>;
   exists(id: number): Promise<boolean>;
 }

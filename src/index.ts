@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import Fastify from "fastify";
-import { registerDependencies, requestScopePlugin, authUserPlugin } from "./packages/di";
+import { registerDependencies, containerPlugin, authUserPlugin } from "./packages/di";
 import { registerAuthRoutes } from "./api/controllers/auth-controller";
 
 // Register global dependencies
@@ -12,7 +12,7 @@ const fastify = Fastify({
 });
 
 // Register our DI container plugins
-fastify.register(requestScopePlugin);
+fastify.register(containerPlugin);
 
 // Mock auth plugin to simulate authenticated users
 // In a real app, this would be a JWT or session-based auth plugin
