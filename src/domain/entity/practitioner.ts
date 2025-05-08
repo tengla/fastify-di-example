@@ -4,7 +4,7 @@ import { UsersRepository } from "../repository/users";
 import { type Insertable } from "kysely";
 import { type Practitioners } from "@/generated/db.d";
 
-type InsertablePractitioner = Omit<Insertable<Practitioners>, "user_id">;
+type InsertablePractitioner = Omit<Insertable<Practitioners>, "user_id" | "id" | "created_at">;
 
 @injectable()
 export class PractitionerEntity {

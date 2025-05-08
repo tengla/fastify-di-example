@@ -7,16 +7,6 @@ const dialect = new SqliteDialect({
   database: new SQLite("store.db"),
 });
 
-export type Database = {
-  users: {
-    id: number;
-    username: string;
-    password: string;
-    email: string;
-    created_at: Date;
-  };
-};
-
 export const db = new Kysely<DB>({
   dialect,
 });

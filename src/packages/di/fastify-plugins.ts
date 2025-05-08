@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getRequestContainer, disposeRequestContainer } from "./container";
-import { AuthUserEntity } from "../../domain/entity/auth-user";
+import { AuthUserEntity } from "@/domain/entity/auth-user";
 import fp from "fastify-plugin";
 
 /**
