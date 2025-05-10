@@ -25,6 +25,7 @@ export class CreatePractitionerUseCase implements UseCase<
   Omit<Insertable<Practitioners>, "user_id">,
   ReturnType<PractitionerEntity["createPractitioner"]> extends Promise<infer T> ? T : never
 > {
+  tableName = "practitioners";
   userProvider = {
     getCurrentUserId: async () => {
       if (!this.authService.isAuthenticated()) {
@@ -33,6 +34,7 @@ export class CreatePractitionerUseCase implements UseCase<
       return this.authService.user.id;
     }
   };
+
   constructor(
     @inject(PractitionerEntity) private practitionerEntity: PractitionerEntity,
     @inject(AuthService) private authService: AuthService

@@ -1,14 +1,13 @@
 import { db } from "@/packages/database";
 import { type DB } from "@/generated/db.d";
 import { DeleteResult, sql, type Insertable, type Selectable, type Updateable } from "kysely";
-import { type CRUDRepository } from "./icrud";
 
 /**
  * BaseRepository provides a generic implementation of the CRUDRepository interface
  * It uses explicit sql fragments and type assertions to work around Kysely's typing limitations
  * while maintaining type safety for the API consumers
  */
-export abstract class BaseRepository<T extends keyof DB> implements CRUDRepository<DB[T]> {
+export abstract class BaseRepository<T extends keyof DB> {
   constructor(protected readonly tableName: T) {}
 
   async create(item: Insertable<DB[T]>): Promise<Selectable<DB[T]>> {

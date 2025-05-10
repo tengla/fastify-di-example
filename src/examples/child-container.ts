@@ -9,7 +9,7 @@ import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fas
 import { LoggerService, Logger } from "@/domain/services/logger.service";
 import { CreatePractitionerUseCase } from "@/domain/use-cases/employees/create-practitioner";
 import { WelcomeUseCase } from "@/domain/use-cases/welcome/welcome";
-import type { UseCase, UseCaseError } from "@/domain/use-cases/use-case";
+import { UseCaseError } from "@/domain/use-cases/use-case";
 
 const users = new Map<string, { id: string; email: string; name: string; role: string }>();
 users.set("1", { id: "1", email: "john@example", name: "John Doe", role: "admin" });
@@ -35,6 +35,7 @@ app.addHook("onRequest", async (request, reply) => {
       userId: request.headers["x-user-id"],
     })
   );
+  const logger = container.resolve<typeof Logger>(LoggerService);
   const context = container.createChildContainer();
   const userId = request.headers["x-user-id"] as string;
   if (userId && users.has(userId)) {
@@ -50,9 +51,9 @@ app.addHook("onRequest", async (request, reply) => {
         })
       )
     )
-    Logger.info({ userId }, "User authenticated");
+    logger.info({ userId }, "User authenticated");
   } else {
-    Logger.error({ userId }, "Unauthorized");
+    logger.error({ userId }, "Unauthorized");
     reply.code(401).send({ error: "Unauthorized" });
   }
   request.container = context;
@@ -62,7 +63,7 @@ app.addHook("onResponse", async (request) => {
   await request.container.dispose();
 });
 
-app.get("/", async (request,reply) => {
+app.get("/", async (request, reply) => {
   const useCase = request.container.resolve(WelcomeUseCase);
   try {
     return { hello: await useCase.execute() };
@@ -80,13 +81,19 @@ app.post("/practitioners", {
       email: z.string().email(),
     }),
   }
-}, async (request) => {
+}, async (request, reply) => {
   const useCase = request.container.resolve(CreatePractitionerUseCase);
-  const record = await useCase.execute({
-    name: request.body.name,
-    email: request.body.email,
-  })
-  return record;
+  try {
+    const record = await useCase.execute({
+      name: request.body.name,
+      email: request.body.email,
+    })
+    return record;
+  } catch (error: unknown) {
+    const err = error as UseCaseError;
+    request.log.error(err);
+    reply.code(err.httpCode).send(err.message);
+  }
 });
 
 app.listen({ port: 3000 }, (err, address) => {
