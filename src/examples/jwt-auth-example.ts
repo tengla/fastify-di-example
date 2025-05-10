@@ -33,7 +33,7 @@ const jwtAuthPlugin = fp(async (fastify) => {
   // Add decorator to check if request is authenticated
   // Only decorate if it doesn't already exist
   if (!fastify.hasRequestDecorator('user')) {
-    fastify.decorateRequest('user', null);
+    fastify.decorateRequest('user', null as unknown as { id: number, email: string, role?: string });
   }
   
   // Custom JWT extractor from request

@@ -8,16 +8,26 @@ import { UseCaseError } from "@/domain/use-cases/use-case";
 export class WelcomeUseCase implements UseCase<
   string, string
 > {
+  tableName = null;
+  userProvider = {
+    getCurrentUserId: async () => {
+      if (!this.authService.isAuthenticated()) {
+        return null;
+      }
+      return this.authService.user.id;
+    }
+  }
   constructor(
     @inject(AuthService) private authService: AuthService,
   ) { }
-  async execute(name: string) {
-    if(!this.authService.isAuthenticated()) {
-      throw new UseCaseError('Authentication required', 401);
+  async execute() {
+    if (!this.authService.isAuthenticated()) {
+      throw new UseCaseError("Authentication required", 401);
     }
-    if (!this.authService.hasRole("user")) {
-      throw new UseCaseError('User access required', 403);
+    if (!this.authService.isAuthenticatedWithRole("admin")) {
+      throw new UseCaseError("Admin access required", 403);
     }
+    const name = this.authService.user.name || "Guest";
     return "Welcome, " + name + "!";
   }
 }

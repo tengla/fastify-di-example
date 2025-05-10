@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { AuditsRepository } from "@/domain/repository/audits";
 
-type Action = "INSERT" | "UPDATE" | "DELETE";
+export type Action = "INSERT" | "UPDATE" | "DELETE";
 
 @injectable()
 export class AuditEntity {
@@ -20,6 +20,6 @@ export class AuditEntity {
       record_id,
       user_id,
     });
-    return `Audit Entry(${record.id}) - Action: ${record.action}, Table: ${record.table_name}, Record ID: ${record_id}, Timestamp: ${record.timestamp}`;
+    return `Audit Entry(${record.id}) - Action: ${record.action}, Table: ${record.table_name}, Record ID: ${record_id}, User ID: ${user_id}, Timestamp: ${record.timestamp}`;
   }
 }

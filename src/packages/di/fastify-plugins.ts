@@ -2,22 +2,25 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getRequestContainer, disposeRequestContainer } from "./container";
 import { AuthUserEntity } from "@/domain/entity/auth-user";
 import fp from "fastify-plugin";
+import type { DependencyContainer } from "tsyringe";
 
 /**
  * Plugin that adds a request-scoped DI container to each request
  */
 export const containerPlugin = fp(async (fastify: FastifyInstance) => {
-  // Add decorator for the container
-  fastify.decorateRequest('container', null);
+  // Add decorator for the container with proper type
+  if (!fastify.hasRequestDecorator('container')) {
+    fastify.decorateRequest('container', null as unknown as DependencyContainer);
+  }
   
   // Add hook to create container for each request
-  fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.addHook('onRequest', async (request: FastifyRequest) => {
     const requestContainer = getRequestContainer(request);
     request.container = requestContainer;
   });
   
   // Add hook to clean up container after the response
-  fastify.addHook('onResponse', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.addHook('onResponse', async (request: FastifyRequest) => {
     disposeRequestContainer(request);
   });
 });

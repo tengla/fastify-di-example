@@ -3,6 +3,7 @@ import { scoped, Lifecycle } from "tsyringe";
 export interface AuthUserProps {
   id: number;
   email: string;
+  name?: string;
   role?: string;
 }
 
@@ -10,11 +11,13 @@ export interface AuthUserProps {
 export class AuthUserEntity {
   id: number;
   email: string;
+  name?: string;
   role?: string;
   
   constructor(props?: AuthUserProps) {
     this.id = props?.id || 0;
     this.email = props?.email || '';
+    this.name = props?.name;
     this.role = props?.role;
   }
   

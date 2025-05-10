@@ -11,6 +11,15 @@ interface GetCurrentUserOutput {
 
 @scoped(Lifecycle.ContainerScoped)
 export class GetCurrentUserUseCase implements UseCase<void, GetCurrentUserOutput> {
+  tableName = null;
+  userProvider = {
+    getCurrentUserId: async () => {
+      if (!this.authService.isAuthenticated()) {
+        return null;
+      }
+      return this.authService.user.id;
+    }
+  };
   constructor(private authService: AuthService) {}
 
   async execute(): Promise<GetCurrentUserOutput> {

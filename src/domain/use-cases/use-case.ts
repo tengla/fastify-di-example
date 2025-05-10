@@ -1,5 +1,12 @@
+import type { UserProvider } from "@/packages/decorators/audit.decorator";
 
 export abstract class UseCase<T, R> {
+  tableName?: string | null = null;
+  userProvider?: UserProvider = {
+    getCurrentUserId: async () => {
+      return null;
+    }
+  };
   abstract execute(input: T): R | Promise<R>;
 }
 

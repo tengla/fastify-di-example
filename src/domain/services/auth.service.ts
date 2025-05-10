@@ -27,4 +27,7 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.authUser.isAuthenticated();
   }
+  isAuthenticatedWithRole(role: string): boolean {
+    return this.authUser.isAuthenticated() && this.authUser.hasRole(role);
+  }
 }

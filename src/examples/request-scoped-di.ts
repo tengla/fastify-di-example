@@ -15,7 +15,10 @@ fastify.register(containerPlugin);
 
 // Mock auth plugin to simulate authenticated users
 // In a real app, this would be a JWT or session-based auth plugin
-fastify.decorateRequest('user', null);
+import type { AuthUserProps } from "../domain/entity/auth-user";
+if (!fastify.hasRequestDecorator('user')) {
+  fastify.decorateRequest('user', null as unknown as AuthUserProps);
+}
 fastify.addHook('onRequest', async (request, reply) => {
   // Simulate an authenticated user
   request.user = {

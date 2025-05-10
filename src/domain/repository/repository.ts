@@ -18,7 +18,6 @@ export abstract class BaseRepository<T extends keyof DB> implements CRUDReposito
       .values(item)
       .returningAll()
       .executeTakeFirstOrThrow();
-    
     return result as Selectable<DB[T]>;
   }
 
