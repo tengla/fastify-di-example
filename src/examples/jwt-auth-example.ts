@@ -199,8 +199,7 @@ fastify.get<{
   };
 }>('/api/welcome/:name', async (request) => {
   const usecase = request.container.resolve(WelcomeUseCase);
-  const { name } = request.params;
-  const message = await usecase.execute(name);
+  const message = await usecase.execute();
   return { message };
 });
 

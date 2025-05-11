@@ -12,17 +12,16 @@ export abstract class BaseService {
     // Get user context from current request scope
     const userId = this.getCurrentUserId();
     if (!userId) {
-      this.logger?.warn("No user context available for audit");
+      this.logger.warn("No user context available for audit");
       return;
     }
     // Add user context to audit data
-    const res = await this.audit.log(
+    await this.audit.log(
       data.action as "INSERT" | "UPDATE" | "DELETE",
       data.table_name,
       data.record_id,
       userId
     );
-    this.logger?.info(res);
   }
 
   // Can be overridden by subclasses if needed

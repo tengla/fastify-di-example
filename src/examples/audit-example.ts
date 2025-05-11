@@ -8,7 +8,7 @@ import { AuthUserEntity } from "@/domain/entity/auth-user";
 @injectable()
 class UserRepository {
   tableName = "users";
-  
+
   async findById(id: number) {
     // Simulate database query
     return { id, name: "Example User", email: "user@example.com" };
@@ -16,7 +16,7 @@ class UserRepository {
 
   @Audited(
     "INSERT",
-    (result) => result.id,
+    (result: { id: number }) => result.id,
     (action, data) => console.log(action, data)
   )
   async create(data: { name: string; email: string }) {
@@ -30,7 +30,7 @@ class UserRepository {
 
   @Audited(
     "UPDATE",
-    (result) => result.id,
+    (result: { id: number }) => result.id,
     (action, data) => console.log(action, data)
   )
   async update(id: number, data: Partial<{ name: string; email: string }>) {
@@ -43,7 +43,7 @@ class UserRepository {
 
   @Audited(
     "DELETE",
-    (id) => id,
+    (result: { id: number }) => result.id,
     (action, data) => console.log(action, data)
   )
   async delete(id: number) {
@@ -76,7 +76,7 @@ class UserService {
   constructor(
     @inject(UserRepository) private userRepository: UserRepository,
     @inject(AuthService) private authService: AuthService
-  ) {}
+  ) { }
 
   // Standard usage with default user provider (AuthService)
   async createUser(data: { name: string; email: string }) {
@@ -86,7 +86,7 @@ class UserService {
   // Using a custom user provider
   @Audited(
     "UPDATE",
-    (result) => result.id,
+    (result: { id: number }) => result.id,
     (action, data) => console.log(action, data)
   )
   async updateUserWithApiKey(id: number, data: Partial<{ name: string; email: string }>) {

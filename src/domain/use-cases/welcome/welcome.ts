@@ -9,15 +9,6 @@ import { Logger, LoggerService } from "@/domain/services/logger.service";
 export class WelcomeUseCase implements UseCase<
   string, string
 > {
-  tableName = null;
-  userProvider = {
-    getCurrentUserId: async () => {
-      if (!this.authService.isAuthenticated()) {
-        return null;
-      }
-      return this.authService.user.id;
-    }
-  }
   constructor(
     @inject(AuthService) private authService: AuthService,
     @inject(LoggerService) private logger: typeof Logger,

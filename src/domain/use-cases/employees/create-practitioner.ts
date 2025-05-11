@@ -3,9 +3,9 @@ import { UseCase } from "../use-case";
 import { type Insertable } from "kysely";
 import { type Practitioners } from "@/generated/db.d";
 import { PractitionerEntity } from "@/domain/entity/practitioner";
-import { AuthService } from "@/domain/services/auth.service";
 import { PractitionerService } from "@/domain/services/practitioner.service";
 import { UserService } from "@/domain/services/user.service";
+import { Logger, LoggerService } from "@/domain/services/logger.service";
 
 @injectable()
 export class CreatePractitionerUseCase implements UseCase<
@@ -14,10 +14,12 @@ export class CreatePractitionerUseCase implements UseCase<
 > {
   constructor(
     @inject(PractitionerService) private practitionerService: PractitionerService,
-    @inject(UserService) private userService: UserService
+    @inject(UserService) private userService: UserService,
+    @inject(LoggerService) private logger: typeof Logger
   ) { }
 
   async execute(input: Omit<Insertable<Practitioners>, "user_id">) {
+    performance.mark("create-practitioner-start");
     const user = await this.userService.createUser({
       name: input.name,
       email: input.email,
@@ -26,6 +28,15 @@ export class CreatePractitionerUseCase implements UseCase<
       ...input,
       user_id: user.id!,
     });
+    performance.mark("create-practitioner-end");
+    const measure = performance.measure(
+      "create-practitioner",
+      "create-practitioner-start",
+      "create-practitioner-end"
+    );
+    this.logger.info(
+      `Create practitioner use case executed in ${measure.duration}ms`
+    );
     return practitioner;
   }
 }

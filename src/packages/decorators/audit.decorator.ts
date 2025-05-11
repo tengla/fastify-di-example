@@ -31,9 +31,9 @@ export type AuditRecord = {
  * @param getRecordId Function to extract the record ID from the method result
  * @param userProvider Optional custom provider for getting the current user ID
  */
-export function Audited<IdType extends { id: string | number } = { id: string }>(
+export function Audited<IdType>(
   action: AuditAction,
-  getRecordId: (result: IdType) => IdType["id"],
+  getRecordId: (result: IdType) => number | string,
   sendAudit: (action: string, data: AuditRecord) => void
 ) {
   return function (
