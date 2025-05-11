@@ -1,11 +1,10 @@
 import "reflect-metadata/lite";
 import { container } from "tsyringe";
 import fastify from "fastify";
-import pino from "pino";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
+import { z } from "zod";
 import { AuthUserEntity } from "@/domain/entity/auth-user";
 import { AuthService } from "@/domain/services/auth.service";
-import { z } from "zod";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 import { LoggerService, Logger } from "@/domain/services/logger.service";
 import { CreatePractitionerUseCase } from "@/domain/use-cases/employees/create-practitioner";
 import { WelcomeUseCase } from "@/domain/use-cases/welcome/welcome";
@@ -28,14 +27,11 @@ const app = fastify().withTypeProvider<ZodTypeProvider>()
   .setSerializerCompiler(serializerCompiler);
 
 app.addHook("onRequest", async (request, reply) => {
-  container.registerInstance(
-    LoggerService,
-    Logger.child({
-      requestId: request.id,
-      userId: request.headers["x-user-id"],
-    })
-  );
-  const logger = container.resolve<typeof Logger>(LoggerService);
+  const logger = Logger.child({
+    requestId: request.id,
+    userId: request.headers["x-user-id"],
+  })
+  container.registerInstance(LoggerService,logger);
   const context = container.createChildContainer();
   const userId = request.headers["x-user-id"] as string;
   if (userId && users.has(userId)) {

@@ -1,3 +1,4 @@
+import type { BaseService } from "@/domain/services/base.service";
 import EventEmitter from "node:events";
 
 /**
@@ -14,15 +15,6 @@ export interface UserProvider {
    * Returns the current user's ID or null if not authenticated
    */
   getCurrentUserId(): Promise<number | null>;
-}
-
-export abstract class AuditProvider {
-  tableName: string | null = null;
-  userProvider: UserProvider = {
-    getCurrentUserId: async () => {
-      return null;
-    }
-  }
 }
 
 export type AuditRecord = {
@@ -96,13 +88,33 @@ export function Audited<IdType extends { id: string | number } = { id: string }>
   };
 }
 
-export class AuditEvent<T> {
-  events: EventEmitter = new EventEmitter();
-  constructor() { }
-  emit(action: string, data: T) {
-    this.events.emit("audit", action, data);
-  }
-  onaudit(callback: (action: string, data: T) => void) {
-    this.events.on("audit", callback);
-  }
+export function Audit<IdType>(
+  action: AuditAction,
+  getRecordId: (result: IdType) => number | string
+) {
+  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = async function(this: { emitAudit?: (data: any) => void; tableName?: string }, ...args: any[]) {
+      // Execute the original method
+      const result = await originalMethod.apply(this, args);
+      
+      // Check if class implements our protocol
+      if (this.emitAudit && typeof this.emitAudit === 'function') {
+        const auditData = {
+          action,
+          table_name: this.tableName || target.constructor.name,
+          record_id: getRecordId(result),
+          method_name: propertyKey,
+          timestamp: new Date()
+        };
+        
+        // Delegate audit handling to the class's protocol method
+        this.emitAudit(auditData);
+      } else {
+        console.warn(`Class ${target.constructor.name} does not implement the audit protocol.`);
+      }
+      
+      return result;
+    };
+  };
 }
