@@ -31,7 +31,7 @@ describe("UserService", () => {
     });
     expect(mockFn).toHaveBeenCalledWith(
       "INSERT",
-      "UserService",
+      "users",
       expect.any(Number),
       1
     );
